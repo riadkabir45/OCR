@@ -15,13 +15,16 @@ def custom_collate_fn(batch):
         pad_w = max_w - img.shape[2]
         padded_img = F.pad(img, (0, pad_w, 0, pad_h), 'constant', 0)
         padded_images.append(padded_img)
-        # Pad each mask in the mask_list
         padded_mask_list = []
-        for mask in mask_list:
-            pad_hm = max_h - mask.shape[0]
-            pad_wm = max_w - mask.shape[1]
-            padded_mask = F.pad(mask, (0, pad_wm, 0, pad_hm), 'constant', 0)
-            padded_mask_list.append(padded_mask)
+        if len(mask_list) == 0:
+            # Add a dummy mask if none exist
+            padded_mask_list.append(torch.zeros((max_h, max_w), dtype=img.dtype))
+        else:
+            for mask in mask_list:
+                pad_hm = max_h - mask.shape[0]
+                pad_wm = max_w - mask.shape[1]
+                padded_mask = F.pad(mask, (0, pad_wm, 0, pad_hm), 'constant', 0)
+                padded_mask_list.append(padded_mask)
         padded_masks.append(padded_mask_list)
     images = torch.stack(padded_images, 0)
     return images, padded_masks
