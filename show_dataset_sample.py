@@ -1,3 +1,4 @@
+NUM_MASKS_TO_SHOW = 5  # Set how many masks to show
 import torch
 from torch.utils.data import DataLoader
 from data.dataset import LocalizationDataset
@@ -24,9 +25,9 @@ plt.imshow(img)
 plt.title('Image')
 plt.axis('off')
 
-for i in range(min(5, len(masks))):
+for i in range(min(NUM_MASKS_TO_SHOW, len(masks))):
     mask = masks[i].cpu().numpy()
-    plt.subplot(1, 6, i+2)
+    plt.subplot(1, NUM_MASKS_TO_SHOW+1, i+2)
     plt.imshow(mask, cmap='gray')
     plt.title(f'Mask {i+1}')
     plt.axis('off')

@@ -40,7 +40,7 @@ criterion = BCEDiceLoss()
 instance_criterion = DiscriminativeLoss(delta_pull=0.1, delta_push=0.5)
 
 # Training Loop
-num_epochs = 10
+num_epochs = 50
 
 def evaluate(model, dataloader, criterion, instance_criterion, device):
     model.eval()

@@ -42,5 +42,52 @@ class DiscriminativeLoss(nn.Module):
         self.delta_pull = delta_pull
         self.delta_push = delta_push
     def forward(self, embedding_maps, instance_masks):
-        # Dummy implementation: always return zero loss (replace with real logic as needed)
-        return torch.tensor(0.0, device=embedding_maps.device if isinstance(embedding_maps, torch.Tensor) else 'cpu')
+        # embedding_maps: (B, emb_dim, H, W)
+        # instance_masks: list of list of (H, W) masks per image
+        device = embedding_maps.device
+        batch_size, emb_dim, H, W = embedding_maps.shape
+        total_loss = 0.0
+        eps = 1e-6
+        for b in range(batch_size):
+            emb = embedding_maps[b]  # (emb_dim, H, W)
+            masks = instance_masks[b]
+            instance_means = []
+            pull_loss = 0.0
+            pixel_count = 0
+            for mask in masks:
+                mask = mask.to(device)
+                if mask.sum() == 0:
+                    continue
+                # Crop mask and embedding to min common shape
+                h_mask, w_mask = mask.shape
+                h_emb, w_emb = emb.shape[1:]
+                min_h = min(h_mask, h_emb)
+                min_w = min(w_mask, w_emb)
+                mask_cropped = mask[:min_h, :min_w]
+                emb_cropped = emb[:, :min_h, :min_w]
+                mask_flat = mask_cropped.reshape(-1)
+                emb_flat = emb_cropped.reshape(emb_dim, -1)
+                emb_fg = emb_flat[:, mask_flat > 0]  # (emb_dim, N_fg)
+                if emb_fg.shape[1] == 0:
+                    continue
+                mean = emb_fg.mean(dim=1)
+                instance_means.append(mean)
+                # Pull loss: variance within instance
+                pull_loss += ((emb_fg.t() - mean) ** 2).sum() / (emb_fg.shape[1] + eps)
+                pixel_count += emb_fg.shape[1]
+            if len(instance_means) > 1:
+                means = torch.stack(instance_means, dim=0)  # (num_inst, emb_dim)
+                # Push loss: means should be far apart
+                push_loss = 0.0
+                for i in range(len(means)):
+                    for j in range(i + 1, len(means)):
+                        dist = torch.norm(means[i] - means[j])
+                        push_loss += torch.clamp(self.delta_push - dist, min=0) ** 2
+                push_loss = push_loss / (len(means) * (len(means) - 1) / 2)
+            else:
+                push_loss = 0.0
+            if pixel_count > 0:
+                pull_loss = pull_loss / len(instance_means)
+            total_loss += self.delta_pull * pull_loss + push_loss
+        total_loss = total_loss / batch_size
+        return total_loss
