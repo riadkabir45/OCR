@@ -1,4 +1,121 @@
-converted
-saved_models
-OpenEdit
-__pycache__
+# Dataset and converted files
+converted/
+dataset/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyTorch & Model files
+*.pth
+*.pt
+*.onnx
+*.weights
+models/
+weights/
+checkpoints/
+
+# YOLO specific
+runs/
+wandb/
+*.cfg
+*.data
+*.names
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS specific
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.backup
+*~
+
+# Output directories
+output/
+results/
+predictions/
+visualizations/
+plots/
+
+# Analysis and metrics results
+*_analysis/
+*_analysis_*/
+nms_analysis*/
+performance_analysis*/
+model_comparison*/
+metrics_results/
+analysis_results/
+
+# Metric result files
+*.csv
+*.json
+*_metrics.txt
+*_results.txt
+*_comparison.png
+*_analysis.png
+*_performance.png
+comparison_*.png
+analysis_*.png
+metrics_*.png
+
+# ML experiment tracking
+logs/
+tensorboard/
+mlruns/
+wandb/
+
+# Image files (uncomment if you want to track sample images)
+# *.jpg
+# *.jpeg
+# *.png
+# *.bmp
+# *.tiff
+
+yolo_labels
